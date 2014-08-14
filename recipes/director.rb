@@ -100,7 +100,7 @@ else
   unmanagedhosts = []
 end
 
-_name = ->(sth) { sth.respond_to?(:name) ? sth.name : sth['id'] }
+names = ->(sth) { sth.respond_to?(:name) ? sth.name : sth['id'] }
 
 storages = search(:node, 'tags:bacula_storage')
 storages << node if tagged?('bacula_storage') && !storages.map(&_name).include?(node.name)
@@ -109,7 +109,7 @@ storages.sort_by!(&_name)
 clients = search(:node, 'tags:bacula_client')
 clients.concat unmanagedhosts
 clients << node unless clients.map(&_name).include?(node.name)
-clients.sort_by!(&_name)
+clients.sort_by!(&names)
 
 template '/etc/bacula/bacula-dir.conf' do
   owner 'root'
