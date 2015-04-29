@@ -20,15 +20,15 @@ module BaculaNG
       db.close rescue nil
     end
 
-    def solo_require_attributes(*attributes)
-      if Chef::Config[:solo]
-        unless (missing = attributes.select { |attr|node["$.#{attr}"].empty? }).empty?
-          Chef::Application.fatal! "You must set #{missing.join(', ')} in chef-solo mode."
-        end
-      else
-        yield if block_given?
-      end
-    end
+    # def solo_require_attributes(*attributes)
+    #   if Chef::Config[:solo]
+    #     unless (missing = attributes.select { |attr|node["$.#{attr}"].empty? }).empty?
+    #       Chef::Application.fatal! "You must set #{missing.join(', ')} in chef-solo mode."
+    #     end
+    #   else
+    #     yield if block_given?
+    #   end
+    # end
   end
 end
 

@@ -8,6 +8,7 @@ Director {
   Maximum Concurrent Jobs = 1
   Password = <%= node['bacula']['director']['password'] %>
   Messages = Daemon
+  DIRport = 9101
 }
 
 ### General
@@ -19,7 +20,11 @@ Catalog {
   password = <%= node['bacula']['director']['db_password'] %>
 <% if node['bacula']['database'] == 'postgresql' -%>
    DB Address = localhost
-   DB Port = <%= node["postgresql"]["config"]["port"] %>
+   DB Port = <%= node['postgresql']['config']['port'] %>
+<% end -%>
+<% if node['bacula']['database'] == 'mysql' -%>
+  DB Address = 127.0.0.1
+  DB Port = 3306
 <% end -%>
 }
 

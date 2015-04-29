@@ -7,8 +7,8 @@ long_description IO.read(File.join(File.dirname(__FILE__), 'README.md'))
 version          '0.2.0'
 
 depends 'apache2'
-depends 'chef-solo-search'
 depends 'database'
+depends 'mysql2_chef_gem'
 depends 'iptables'
 depends 'mysql'
 depends 'openssl'

@@ -1,5 +1,7 @@
 raise 'Need to run on bacula-dir node' unless tagged?('bacula_director')
 
+node.default['apache']['mpm'] = 'prefork'
+
 include_recipe 'php'
 include_recipe 'php::module_gd'
 case node['bacula']['database']
@@ -12,7 +14,7 @@ include_recipe 'apache2::mod_ssl' if node['bacula']['web']['ssl_key_path']
 
 directory '/srv/bacula-web'
 
-tarball = "bacula-web-#{node['bacula']['web']['version']}.tar.gz"
+tarball = "bacula-web-#{node['bacula']['web']['version']}.tgz"
 tarball_path = "#{Chef::Config[:file_cache_path]}/#{tarball}"
 
 execute 'install bacula-web' do
@@ -40,4 +42,12 @@ directory '/srv/bacula-web/application/view/cache' do
   mode '0775'
 end
 
-web_app 'bacula-web'
+web_app 'bacula-web' do
+  template 'web_app.conf.erb'
+  server_name node['bacula']['web']['domain']
+  docroot '/srv/bacula-web/'
+  allow_override 'All'
+  directory_index 'index.html index.php'
+  directory_options 'FollowSymLinks Indexes'
+  cookbook 'apache2'
+end

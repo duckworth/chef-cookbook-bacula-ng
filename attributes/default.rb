@@ -1,6 +1,6 @@
 default['bacula']['database'] = 'postgresql'
 default['bacula']['restore_dir'] = '/srv/bacula/restore'
-default['bacula']['use_iptables'] = true
+default['bacula']['use_iptables'] = 'true'
 
 
 default['bacula']['storage']['name'] = "#{name}:storage"
@@ -21,6 +21,9 @@ default['bacula']['client']['file_retention'] = '1 year'
 default['bacula']['client']['job_retention'] = '1000 years'
 
 default['bacula']['web']['domain'] = node['fqdn']
-default['bacula']['web']['version'] = '5.2.13-1'
-default['bacula']['web']['download_url'] = 'http://www.bacula-web.org/tl_files/downloads/'
-default['bacula']['web']['download_checksum'] = 'c9787c1999a87af4086b296fc0d2edba9f65d16cf9b4a90a818d109d2e76844f'
+default['bacula']['web']['version'] = '7.0.3'
+default['bacula']['web']['download_url'] = 'http://www.bacula-web.org/download.html?file=files/bacula-web.org/downloads/'
+default['bacula']['web']['download_checksum'] = '6030a587cb32ac34c0b338fac95bb8c57ff2efda6989ea9131dcdc3547fb14ba'
+
+default['bacula']['mysql']['data_dir'] = '/var/lib/mysql-default'
+

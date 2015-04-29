@@ -1,4 +1,3 @@
-include_recipe 'chef-solo-search' if Chef::Config[:solo]
 
 chef_gem 'chef-helpers' do
   version '~> 0.0.7'
@@ -14,9 +13,7 @@ node.set['bacula']['package_flavour'] =
   else raise "Unknown bacula.database #{node['bacula']['database'].inspect}"
   end
 
-solo_require_attributes 'bacula.mon.password' do
   node.set_unless['bacula']['mon']['password'] = secure_password
-end
 
 file '/etc/bacula/common_default_passwords' do
   action :delete

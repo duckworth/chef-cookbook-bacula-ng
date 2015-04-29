@@ -16,7 +16,8 @@ directors.sort_by!(&:name)
 
 clients = search(:node, 'tags:bacula_client')
 clients << node if !clients.map(&:name).include?(node.name) && tagged?('bacula_client')
-clients.sort_by(&:name)
+clients_sort_by = clients.sort_by(&:name)
+clients_sort_by
 
 if directors.empty?
   Chef::Log.warn("Couldn't find Bacula director, using stub entry")

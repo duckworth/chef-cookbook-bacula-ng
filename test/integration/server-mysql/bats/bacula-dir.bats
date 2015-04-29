@@ -28,7 +28,7 @@ load helpers/test_helper
 }
 
 @test "database is created and populated" {
-    echo 'SELECT * FROM Version;' | mysql -uroot -pswordfish bacula
+    echo 'SELECT * FROM Version;' | mysql -uroot -pswordfish -h 127.0.0.1 bacula
 }
 
 @test "can back up and restore" {

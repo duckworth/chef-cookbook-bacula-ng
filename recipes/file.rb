@@ -1,9 +1,7 @@
 include_recipe 'bacula-ng::_common'
 
-solo_require_attributes 'bacula.fd.password' do
-  node.set_unless['bacula']['fd']['password'] = secure_password
-  node.save
-end
+node.set_unless['bacula']['fd']['password'] = secure_password
+node.save
 
 directors = search(:node, 'tags:bacula_director')
 if node['$.bacula.director.password'].any? || tagged?('bacula_director') ||

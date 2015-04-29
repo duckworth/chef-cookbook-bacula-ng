@@ -5,11 +5,14 @@ driver_config:
   customize:
     memory: 368
 
+provisioner:
+  name: chef_zero
+
 platforms:
-- name: ubuntu-12.04
-  driver_config:
-    box: opscode-ubuntu-12.04
-    box_url: https://opscode-vm.s3.amazonaws.com/vagrant/opscode_ubuntu-12.04_provisionerless.box
+- name: ubuntu-14.04
+#  driver_config:
+#    box: opscode-ubuntu-14.04
+#    box_url: https://opscode-vm.s3.amazonaws.com/vagrant/opscode_ubuntu-12.04_provisionerless.box
 #- name: ubuntu-10.04
 #  driver_config:
 #    box: opscode-ubuntu-10.04
@@ -26,6 +29,13 @@ suites:
           password: swordfish
         mon:
           password: swordfish
+        director:
+          name: "stub:director"
+          password: "swordfish"
+      id: "stub"
+      ipaddress: "1.1.1.1"
+      tags:
+        - "bacula_director"
   - name: server-postgresql
     run_list:
       - recipe[bacula-ng-test]
@@ -34,7 +44,8 @@ suites:
     attributes:
       bacula:
         client:
-          backup: test_job
+          backup:
+            - test_job
         database: postgresql
         director:
           db_password: swordfish

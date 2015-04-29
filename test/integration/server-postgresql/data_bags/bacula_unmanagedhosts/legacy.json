@@ -1,8 +1,13 @@
 {
   "id": "legacy",
-  "bacula": { 
-    "client": { "backup": [ "test_job" ] },
-    "fd": { "password": "WHATEVER" }
+  "bacula": {
+    "client": {
+      "backup": ["test_job"],
+      "file_retention": "1 month",
+      "job_retention": "5 years"
+    },
+    "fd": {"password": "WHATEVER"}
   },
   "ipaddress": "1.2.3.4"
 }
+

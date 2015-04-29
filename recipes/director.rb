@@ -1,11 +1,9 @@
 include_recipe 'bacula-ng::_common'
 
-solo_require_attributes 'bacula.director.password',
-                        'bacula.director.db_password' do
-  node.set_unless['bacula']['director']['password'] = secure_password
-  node.set_unless['bacula']['director']['db_password'] = secure_password
-  node.save
-end
+
+node.set_unless['bacula']['director']['password'] = secure_password
+node.set_unless['bacula']['director']['db_password'] = secure_password
+node.save
 
 package "bacula-director#{node['bacula']['package_flavour']}"
 service 'bacula-director'
@@ -21,6 +19,17 @@ when 'postgresql'
                     password: node['postgresql']['password']['postgres'] }
 
 
+  postgresql_database 'bacula::schema' do
+    connection host: 'localhost',
+               port: node['postgresql']['config']['port'],
+               username: 'bacula',
+               password: node['bacula']['director']['db_password']
+    database_name 'bacula'
+    sql { ::File.read('/usr/share/dbconfig-common/data/bacula-director-pgsql/install/pgsql') }
+    not_if { pg_has_table?('bacula', 'job') }
+    action :query
+  end
+
   postgresql_database_user 'bacula' do
     connection db_connection
     password node['bacula']['director']['db_password']
@@ -35,21 +44,20 @@ when 'postgresql'
     action :create
   end
 
-  postgresql_database 'bacula::schema' do
-    connection host: 'localhost',
-               port: node['postgresql']['config']['port'],
-               username: 'bacula',
-               password: node['bacula']['director']['db_password']
-    database_name 'bacula'
-    sql { ::File.read('/usr/share/dbconfig-common/data/bacula-director-pgsql/install/pgsql') }
-    not_if { pg_has_table?('bacula', 'job') }
-    action :query
-  end
 when 'mysql'
-  include_recipe 'database::mysql'
-  include_recipe 'mysql::server'
+  mysql2_chef_gem 'default' do
+    action :install
+  end
+  mysql_service 'default' do
+    port '3306'
+    version '5.5'
+    bind_address '0.0.0.0'
+    initial_root_password node['mysql']['server_root_password']
+    data_dir node['bacula']['mysql']['data_dir']
+    action [:create, :start]
+  end
 
-  db_connection = { host: 'localhost',
+  db_connection = { host: '127.0.0.1',
                     username: 'root',
                     password: node['mysql']['server_root_password'] }
 
@@ -63,19 +71,26 @@ when 'mysql'
     connection db_connection
     password node['bacula']['director']['db_password']
     database_name 'bacula'
-    host 'localhost'
+    host '127.0.0.1'
     action [:create, :grant]
   end
 
-  mysql_database 'bacula::schema' do
-    connection host: 'localhost',
-               username: 'bacula',
-               password: node['bacula']['director']['db_password']
-    database_name 'bacula'
-    sql { ::File.read('/usr/share/dbconfig-common/data/bacula-director-mysql/install/mysql') }
-    not_if { File.exist?("#{node['mysql']['data_dir']}/bacula/Version.frm") }
-    action :query
+  execute  'bacula::schema' do
+    command "mysql -u bacula -h 127.0.0.1 -p#{node['bacula']['director']['db_password']} bacula < /usr/share/dbconfig-common/data/bacula-director-mysql/install/mysql"
+    not_if { File.exist?("#{node['bacula']['mysql']['data_dir']}/bacula/Version.frm") }
   end
+
+ #bugs in database cookbook with Procs and multiline queries
+  # mysql_database 'bacula::schema' do
+  #   connection host: '127.0.0.1',
+  #              username: 'bacula',
+  #              password: node['bacula']['director']['db_password']
+  #   database_name 'bacula'
+  #   sql { ::File.read('/usr/share/dbconfig-common/data/bacula-director-mysql/install/mysql')} }
+  #   not_if { File.exist?("#{node['bacula']['mysql']['data_dir']}/bacula/Version.frm") }
+  #   action :query
+  # end
+
 else
   raise "Supported databases are 'postgresql' or 'mysql', not #{node['bacula']['database'].inspect}"
 end
